@@ -256,7 +256,7 @@ def obj(table,eq):
         print('You must finish adding constraints before the objective function can be added.')
 
 # solves maximization problem for optimal solution, returns dictionary w/ keys x1,x2...xn and max.
-def maxz(table):
+def maxz(table, output='summary'):
     while next_round_r(table)==True:
         table = pivot(loc_piv_r(table)[0],loc_piv_r(table)[1],table)
     while next_round(table)==True:
@@ -277,10 +277,13 @@ def maxz(table):
         else:
             val[gen_var(table)[i]] = 0
     val['max'] = table[-1,-1]
-    return val
+    if output == 'table':
+        return table
+    else:
+        return val
 
 # solves minimization problems for optimal solution, returns dictionary w/ keys x1,x2...xn and min.
-def minz(table):
+def minz(table, output='summary'):
     table = convert_min(table)
 
     while next_round_r(table)==True:
@@ -303,7 +306,10 @@ def minz(table):
         else:
             val[gen_var(table)[i]] = 0
     val['min'] = table[-1,-1]*-1
-    return val
+    if output == 'table':
+        return table
+    else:
+        return val
 
 if __name__ == "__main__":
 
