@@ -1,25 +1,19 @@
 """
 Read-me:
 Call functions in this order:
-
     problem = gen_matrix(v,c)
     constrain(problem, string)
     obj(problem, string)
     maxz(problem)
-
 gen_matrix() produces a matrix to be given constraints and an objective function to maximize or minimize.
     It takes var (variable number) and cons (constraint number) as parameters.
     gen_matrix(2,3) will create a 4x7 matrix by design.
-
 constrain() constrains the problem. It takes the problem as the first argument and a string as the second. The string should be
     entered in the form of 1,2,G,10 meaning 1(x1) + 2(x2) >= 10.
     Use 'L' for <= instead of 'G'
-
 Use obj() only after entering all constraints, in the form of 1,2,0 meaning 1(x1) +2(x2) +0
     The final term is always reserved for a constant and 0 cannot be omitted.
-
 Use maxz() to solve a maximization LP problem. Use minz() to solve a minimization problem.
-
 Disclosure -- pivot() function, subcomponent of maxz() and minz(), has a couple bugs. So far, these have only occurred when
     minz() has been called.
 """
@@ -92,8 +86,15 @@ def loc_piv_r(table):
                 total.append(b/i)
             else:
                 # placeholder for elements that did not satisfy the above requirements. Otherwise, our index number would be faulty.
-                total.append(10000)
-        index = total.index(min(total))
+                total.append(0)
+        element = max(total)
+        for t in total:
+            if t > 0 and t < element:
+                element = t
+            else:
+                continue
+
+        index = total.index(element)
         return [index,c]
 # similar process, returns a specific array element to be pivoted on.
 def loc_piv(table):
@@ -101,11 +102,19 @@ def loc_piv(table):
         total = []
         n = find_neg(table)
         for i,b in zip(table[:-1,n],table[:-1,-1]):
-            if b/i >0 and i**2>0:
+            if i**2>0 and b/i>0:
                 total.append(b/i)
             else:
-                total.append(10000)
-        index = total.index(min(total))
+                # placeholder for elements that did not satisfy the above requirements. Otherwise, our index number would be faulty.
+                total.append(0)
+        element = max(total)
+        for t in total:
+            if t > 0 and t < element:
+                element = t
+            else:
+                continue
+
+        index = total.index(element)
         return [index,n]
 
 # Takes string input and returns a list of numbers to be arranged in tableu
@@ -277,6 +286,8 @@ def maxz(table, output='summary'):
         else:
             val[gen_var(table)[i]] = 0
     val['max'] = table[-1,-1]
+    for k,v in val.items():
+        val[k] = round(v,6)
     if output == 'table':
         return table
     else:
@@ -306,6 +317,8 @@ def minz(table, output='summary'):
         else:
             val[gen_var(table)[i]] = 0
     val['min'] = table[-1,-1]*-1
+    for k,v in val.items():
+        val[k] = round(v,6)
     if output == 'table':
         return table
     else:
